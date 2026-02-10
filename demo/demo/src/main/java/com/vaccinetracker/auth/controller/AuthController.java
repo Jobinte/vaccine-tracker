@@ -20,9 +20,9 @@ public class AuthController {
         return authService.register(request);
     }
 
-    // ⭐ NEW LOGIN API
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public String login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
+
 }

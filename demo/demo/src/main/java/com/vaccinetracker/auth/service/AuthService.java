@@ -6,11 +6,12 @@ import com.vaccinetracker.security.JwtService;
 import com.vaccinetracker.auth.entity.User;
 import com.vaccinetracker.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +20,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    // ✅ REGISTER USER
+    // ================= REGISTER =================
     public String register(RegisterRequest request) {
 
+        // check if email already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return "Email already exists";
+            throw new RuntimeException("Email already registered");
         }
 
+        // create user
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -38,22 +42,18 @@ public class AuthService {
         return "User registered successfully";
     }
 
-    // ✅ LOGIN USER + GENERATE JWT
+    // ================= LOGIN =================
     public String login(LoginRequest request) {
 
-        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        // Spring Security checks email + password from DB
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
 
-        if (userOptional.isEmpty()) {
-            return "User not found";
-        }
-
-        User user = userOptional.get();
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return "Invalid password";
-        }
-
-        // generate JWT token
-        return jwtService.generateToken(user.getEmail());
+        // if authentication success → generate JWT token
+        return jwtService.generateToken(request.getEmail());
     }
 }

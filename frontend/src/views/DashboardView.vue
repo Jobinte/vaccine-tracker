@@ -1,14 +1,19 @@
 <template>
-  <div style="text-align:center;margin-top:40px">
+  <div class="dashboard">
+
 
     <h1>Vaccine Dashboard 💉</h1>
 
-    <button @click="logout">Logout</button>
+   <button class="logout-btn" @click="logout">Logout</button>
+
 
     <hr />
+    </div>
 
     <!-- ADD VACCINE -->
+    <div class="section">
     <h2>Add Vaccine Type</h2>
+
 
     <input v-model="name" placeholder="Vaccine name" />
     <input v-model="totalDoses" placeholder="Total doses" type="number" />
@@ -153,5 +158,6 @@ export default {
       return new Date(date).toLocaleDateString();
     }
   }
+
 };
 </script>

@@ -1,48 +1,73 @@
 <template>
-  <div class="container">
-    <h1>Vaccine Tracker - Register</h1>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h1>Register 📝</h1>
 
-    <form @submit.prevent="register">
-      <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="password" type="password" placeholder="Password" required />
-      <button type="submit">Register</button>
-    </form>
+      <input v-model="email" placeholder="Gmail address" />
+      <input v-model="password" type="password" placeholder="Password" />
 
-    <p>{{ message }}</p>
+      <button @click="register">Register</button>
+
+      <p>Already have account? <router-link to="/login">Login</router-link></p>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+<script>
+import api from "../services/api";
 
-const email = ref('')
-const password = ref('')
-const message = ref('')
+export default {
+  data() {
+    return {
+      email: "",
+      password: "",
+    };
+  },
+  methods: {
+    async register() {
+      try {
+        const res = await api.post("/auth/register", {
+          email: this.email,      // ⭐ MUST be email
+          password: this.password // ⭐ MUST be password
+        });
 
-const register = async () => {
-  try {
-    const response = await axios.post('http://localhost:8080/api/auth/register', {
-      email: email.value,
-      password: password.value
-    })
-    message.value = response.data
-  } catch (error) {
-    message.value = "Error registering user"
-  }
-}
+        alert(res.data);
+        this.$router.push("/login");
+      } catch (err) {
+        alert("Register failed: " + err.response.data.message);
+      }
+    },
+  },
+};
 </script>
 
 <style>
-.container {
-  max-width: 400px;
-  margin: 100px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.auth-container {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#f4f6fb;
 }
-input, button {
-  padding: 10px;
-  font-size: 16px;
+.auth-card {
+  width:320px;
+  padding:40px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  text-align:center;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+}
+button{
+  background:#5b5df1;
+  color:white;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:6px;
 }
 </style>
