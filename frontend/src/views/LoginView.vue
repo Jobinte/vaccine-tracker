@@ -1,30 +1,36 @@
-<script setup>
-import { ref } from "vue";
-import API from "../services/api";
-import { useRouter } from "vue-router";
+<script>
+import api from "../services/api";
 
-const email = ref("");
-const password = ref("");
-const router = useRouter();
+export default {
+  data() {
+    return {
+      email: "",
+      password: "",
+      error: "",
+    };
+  },
 
-const login = async () => {
-  try {
-    const response = await API.post("/auth/login", {
-      email: email.value,
-      password: password.value,
-    });
+  methods: {
+    async login() {
+      try {
+        const res = await api.post("/auth/login", {
+          email: this.email,
+          password: this.password,
+        });
 
-    // Save JWT token in browser
-    localStorage.setItem("token", response.data);
+        // ⭐ SAVE TOKEN
+        localStorage.setItem("token", res.data);
 
-    alert("Login successful 🎉");
-    router.push("/dashboard");
-
-  } catch (error) {
-    alert("Login failed ❌");
-  }
+        // ⭐ GO TO DASHBOARD
+        this.$router.push("/dashboard");
+      } catch (err) {
+        this.error = "Invalid email or password";
+      }
+    },
+  },
 };
 </script>
+
 
 <template>
   <div class="container">
