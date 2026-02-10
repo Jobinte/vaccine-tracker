@@ -32,4 +32,9 @@ public class UserVaccineController {
 
         return service.takeDose(getUserEmail(), name, dose);
     }
+    @GetMapping("/reminders")
+    public List<UserVaccine> reminders() {
+        return service.getDueVaccines(getUserEmail());
+    }
+
 }

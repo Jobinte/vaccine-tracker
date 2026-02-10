@@ -37,4 +37,14 @@ public class UserVaccineService {
 
         return repository.save(record);
     }
+    public List<UserVaccine> getDueVaccines(String email) {
+        LocalDate today = LocalDate.now();
+
+        return repository.findByUserEmail(email)
+                .stream()
+                .filter(v -> v.getNextDueDate() != null &&
+                        !v.getNextDueDate().isAfter(today.plusDays(7)))
+                .toList();
+    }
+
 }
